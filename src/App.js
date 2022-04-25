@@ -3,6 +3,8 @@ import './App.css';
 import Modal from 'react-modal';
 require('babel-polyfill');
 
+// Modal.setAppElement("#app");
+
 const customStyles = {
   content : {
     top                   : '5%',
@@ -190,7 +192,8 @@ class App extends Component {
   }
 
   _urlHandler(url, func){
-    var fullUrl = "https://tenki.nt55.net/feed/" + url + ".xml";
+    //var fullUrl = "https://tenki.nt55.net/feed/" + url + ".xml";
+    var fullUrl = "/feed/" + url + ".xml";
     console.log("urlHandler="+fullUrl);
     this.setState({
       url: fullUrl,
