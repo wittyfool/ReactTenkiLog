@@ -166,9 +166,22 @@ class App extends Component {
               obj = data;
             });
             var json_str = JSON.stringify(obj, null, " ");
+	
+	    const regex = /.+:/gm;
+	    const reg2 = /^\s*[\{\}]/gm;
+	    const reg3 = /^\s*\/\/.*/gm;
+	    const reg4 = /[\",]/gm;
+	    const reg5 = /^\s*\n/gm;
+	    var json_repl = json_str
+				.replace(regex, ' ')
+				.replace(reg2, '')
+				.replace(reg3, '')
+				.replace(reg4, '')
+				.replace(reg5, '');	
+
             this.setState({
               modalIsOpen: true,
-              content: json_str,
+              content: json_repl,
               title: title,
             });
         },
