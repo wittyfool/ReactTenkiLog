@@ -3,8 +3,6 @@ import './App.css';
 import Modal from 'react-modal';
 require('babel-polyfill');
 
-// Modal.setAppElement("#app");
-
 const customStyles = {
   content : {
     top                   : '5%',
@@ -104,9 +102,12 @@ class MyList extends Component {
     return (
         <ul>
             <li key={this.props.item["id"]}>
+	      <span class="datetime">
               {dateJST(this.props.item["updated"])}
+	      </span>
               <span> </span>
               <span
+	    	class="xmldata"
                 style={{ color: '#66f', cursor: 'pointer'}}
                 onClick={()=>{this.clickHandler(this.state.url, this.state.title, this.updateHandler)}} >
               {this.props.item["title"]}
@@ -168,9 +169,9 @@ class App extends Component {
             var json_str = JSON.stringify(obj, null, " ");
 	
 	    const regex = /.+:/gm;
-	    const reg2 = /^\s*[\{\}]/gm;
+	    const reg2 = /^\s*[{}]/gm;
 	    const reg3 = /^\s*\/\/.*/gm;
-	    const reg4 = /[\",]/gm;
+	    const reg4 = /[",]/gm;
 	    const reg5 = /^\s*\n/gm;
 	    var json_repl = json_str
 				.replace(regex, ' ')
@@ -281,8 +282,9 @@ class App extends Component {
             }
         </ul>
         <div style={{ textAlign: 'left', fontSize: 'small', margin: '20px' }} >
-          こちらのデータを利用しています<br />
-          <a href="https://www.data.jma.go.jp/developer/xmlpull.html"> 気象庁防災情報XMLフォーマット形式電文の公開（PULL型）</a>
+	    気象庁が公開している防災情報XMLをほとんど加工せずに公開しています
+	    (nginx のリバースプロキシー)<br />
+          <a href="http://xml.kishou.go.jp/xmlpull.html"> 気象庁防災情報XMLフォーマット形式電文の公開（PULL型）</a>
           </div>
         <div style={{ textAlign: 'left', fontSize: 'small', margin: '20px' }} >
           <a href="https://twitter.com/intent/tweet?screen_name=jQR1Fy33tKoWf1Q&hashtags=天気ログ" target="_blank" rel="noopener noreferrer" > 連絡先 </a>

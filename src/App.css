@@ -73,3 +73,11 @@ div.modalHeader button {
   border: solid 1px;
   float: left;
 }
+
+li span.datetime {
+  text-color: #888;
+  font-size: small;
+}
+li span.xmldata:hover {
+  text-color: #f44;
+}
