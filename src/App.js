@@ -200,7 +200,7 @@ class App extends Component {
   }
 
 
-  componentWillMount(){
+  componentDidMount(){
     this._readData();
     Modal.setAppElement( document.getElementById('AppId'));
   }
