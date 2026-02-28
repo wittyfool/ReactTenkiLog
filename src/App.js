@@ -44,6 +44,36 @@ function getTelegramClass(url){
     return classMap[prefix] || 'telegram-other';
 }
 export { getTelegramClass };
+
+// 電文種別コード（先頭4文字）から対応するローカル XSL ファイル名を返す
+const TELEGRAM_XSL_MAP = {
+  'VPFW': '190501_shukan.xsl',        // 府県週間天気予報
+  'VPFD': '190501_yoho.xsl',          // 府県天気予報
+  'VPTW': '190501_yoho.xsl',          // 地域時系列予報
+  'VPZJ': '251222_keihoR6.xsl',       // 気象警報・注意報（R06）
+  'VPWW': '251222_jikeiretsuR6.xsl',  // 気象警報・注意報時系列情報（R06）
+  'VPCW': '250318_ippanho.xsl',       // 全般・地方気象情報
+  'VPCI': '250318_ippanho.xsl',       // 府県気象情報
+  'VPTI': '190501_typhoon.xsl',       // 台風解析・予報情報
+  'VPTS': '190501_tatsumaki.xsl',     // 竜巻注意情報
+  'VYFH': '190501_dosya.xsl',         // 土砂災害警戒情報
+  'VPLS': '190501_kiroame.xsl',       // 記録的短時間大雨情報
+  'VZSA': '190501_tenkizu.xsl',       // 地上実況図
+  'VZBD': '190501_tenkizu.xsl',       // 地上24時間予想図
+  'VZBE': '190501_tenkizu.xsl',       // 地上48時間予想図
+  'VCWG': '190501_chihoumikeiho.xsl', // 地方海上警報
+  'VCWF': '190501_chihoumiyoho.xsl',  // 地方海上予報
+  'VFVO': '220929_kazan.xsl',         // 火山に関するお知らせ
+  'VFSA': '220929_kazan.xsl',         // 噴火に関する火山観測報
+  'VZPS': '190529_kozui.xsl',         // 指定河川洪水予報
+  'VXSE': '240821_jishin_tsunami_nankai_decode_all.xsl', // 地震情報
+};
+function getXslForUrl(url) {
+  const m = url.match(/_([A-Z]{4})\d+_/);
+  if (!m) return null;
+  return TELEGRAM_XSL_MAP[m[1]] || null;
+}
+export { getXslForUrl };
 function dateJST(gmtStr){
     var str = gmtStr.replace(/\./g, ':');
     var jst = new Date(str);
@@ -165,6 +195,33 @@ class App extends Component {
 
   }
 
+  _setJsonContent(xmlText, str, title) {
+    var obj;
+    to_json(xmlText, function(error, data) {
+      obj = data;
+    });
+    var json_str = JSON.stringify(obj, null, " ");
+    const regex = /.+:/gm;
+    const reg2 = /^\s*[{}]/gm;
+    const reg3 = /^\s*\/\/.*/gm;
+    const reg4 = /[",]/gm;
+    const reg5 = /^\s*\n/gm;
+    var json_repl = json_str
+      .replace(regex, ' ')
+      .replace(reg2, '')
+      .replace(reg3, '')
+      .replace(reg4, '')
+      .replace(reg5, '');
+    this.setState({
+      modalIsOpen: true,
+      content: json_repl,
+      contentHtml: null,
+      title: title,
+      telegramClass: getTelegramClass(str),
+      telegramUrl: str,
+    });
+  }
+
   openModal(str, title){
     // ここがキモ
     //
@@ -179,31 +236,43 @@ class App extends Component {
       .then(
         (result) => {
             console.log("openModal: fetch OK");
-            var obj;
-            to_json(result, function(error,data){
-              obj = data;
-            });
-            var json_str = JSON.stringify(obj, null, " ");
-	
-	    const regex = /.+:/gm;
-	    const reg2 = /^\s*[{}]/gm;
-	    const reg3 = /^\s*\/\/.*/gm;
-	    const reg4 = /[",]/gm;
-	    const reg5 = /^\s*\n/gm;
-	    var json_repl = json_str
-				.replace(regex, ' ')
-				.replace(reg2, '')
-				.replace(reg3, '')
-				.replace(reg4, '')
-				.replace(reg5, '');	
-
-            this.setState({
-              modalIsOpen: true,
-              content: json_repl,
-              title: title,
-              telegramClass: getTelegramClass(str),
-              telegramUrl: str,
-            });
+            // xml-stylesheet PI からローカル XSL ファイルを探す。
+            // PI がない場合は電文コードからマッピングする。
+            const piMatch = result.match(/<\?xml-stylesheet[^?]*href="([^"]+)"[^?]*\?>/);
+            const xslFilename = piMatch
+              ? piMatch[1].split('/').pop()
+              : getXslForUrl(str);
+            if (xslFilename) {
+              const localXslUrl = '/xsl/' + xslFilename;
+              fetch(localXslUrl)
+                .then(xslRes => {
+                  if (!xslRes.ok) throw new Error('XSL not found: ' + xslFilename);
+                  return xslRes.text();
+                })
+                .then(xslText => {
+                  const parser = new DOMParser();
+                  const xmlDoc = parser.parseFromString(result, 'application/xml');
+                  const xslDoc = parser.parseFromString(xslText, 'application/xml');
+                  const xsltProcessor = new XSLTProcessor();
+                  xsltProcessor.importStylesheet(xslDoc);
+                  const resultFrag = xsltProcessor.transformToFragment(xmlDoc, document);
+                  const div = document.createElement('div');
+                  div.appendChild(resultFrag);
+                  this.setState({
+                    modalIsOpen: true,
+                    content: null,
+                    contentHtml: div.innerHTML,
+                    title: title,
+                    telegramClass: getTelegramClass(str),
+                    telegramUrl: str,
+                  });
+                })
+                .catch(() => {
+                  this._setJsonContent(result, str, title);
+                });
+            } else {
+              this._setJsonContent(result, str, title);
+            }
         },
         (error) => {
             console.log("openModal: fetch NG");
@@ -267,7 +336,11 @@ class App extends Component {
             )}
           </div>
           <div className="modalContentWrap">
-            <div className={`modalContent ${this.state.telegramClass || ''}`}><pre>{this.state.content}</pre></div>
+            <div className={`modalContent ${this.state.telegramClass || ''}`}>
+              {this.state.contentHtml
+                ? <div dangerouslySetInnerHTML={{ __html: this.state.contentHtml }} />
+                : <pre>{this.state.content}</pre>}
+            </div>
           </div>
         </Modal>
 
