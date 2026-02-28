@@ -81,3 +81,25 @@ li span.datetime {
 li span.xmldata:hover {
   text-color: #f44;
 }
+
+div.modalContent.telegram-weather {
+  background: #e8f4e8;
+}
+div.modalContent.telegram-warning {
+  background: #f4f0e8;
+}
+div.modalContent.telegram-earthquake {
+  background: #f4e8e8;
+}
+div.modalContent.telegram-volcano {
+  background: #f4ece0;
+}
+div.modalContent.telegram-ocean {
+  background: #e8ecf4;
+}
+div.modalContent.telegram-aviation {
+  background: #eef4f4;
+}
+div.modalContent.telegram-other {
+  background: #f0f0f0;
+}

@@ -27,6 +27,23 @@ function readArg(key){
     }
     return get_params.get(key);
 }
+// 電文URLから電文種別コードを取り出し、対応するCSSクラス名を返す
+function getTelegramClass(url){
+    const match = url.match(/_([A-Z]{2,4}\d+)_/);
+    if(!match) return 'telegram-other';
+    const prefix = match[1].substring(0, 2);
+    // 電文種別の先頭2文字をCSSクラスにマッピング
+    const classMap = {
+        'VP': 'telegram-weather',    // 天気予報
+        'VW': 'telegram-warning',    // 気象警報・注意報
+        'VX': 'telegram-earthquake', // 地震
+        'VF': 'telegram-volcano',    // 火山
+        'VM': 'telegram-ocean',      // 海洋
+        'VA': 'telegram-aviation',   // 航空
+    };
+    return classMap[prefix] || 'telegram-other';
+}
+export { getTelegramClass };
 function dateJST(gmtStr){
     var str = gmtStr.replace(/\./g, ':');
     var jst = new Date(str);
@@ -184,6 +201,7 @@ class App extends Component {
               modalIsOpen: true,
               content: json_repl,
               title: title,
+              telegramClass: getTelegramClass(str),
             });
         },
         (error) => {
@@ -245,7 +263,7 @@ class App extends Component {
             <h3> {this.state.title} </h3>
           </div>
           <div className="modalContentWrap">
-            <div className="modalContent"><pre>{this.state.content}</pre></div>
+            <div className={`modalContent ${this.state.telegramClass || ''}`}><pre>{this.state.content}</pre></div>
           </div>
         </Modal>
 
