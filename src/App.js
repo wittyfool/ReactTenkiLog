@@ -27,17 +27,19 @@ function readArg(key){
     }
     return get_params.get(key);
 }
+// 電文URLから電文種別コードを取り出し、対応するCSSクラス名を返す
 function getTelegramClass(url){
     const match = url.match(/_([A-Z]{2,4}\d+)_/);
     if(!match) return 'telegram-other';
     const prefix = match[1].substring(0, 2);
+    // 電文種別の先頭2文字をCSSクラスにマッピング
     const classMap = {
-        'VP': 'telegram-weather',
-        'VW': 'telegram-warning',
-        'VX': 'telegram-earthquake',
-        'VF': 'telegram-volcano',
-        'VM': 'telegram-ocean',
-        'VA': 'telegram-aviation',
+        'VP': 'telegram-weather',    // 天気予報
+        'VW': 'telegram-warning',    // 気象警報・注意報
+        'VX': 'telegram-earthquake', // 地震
+        'VF': 'telegram-volcano',    // 火山
+        'VM': 'telegram-ocean',      // 海洋
+        'VA': 'telegram-aviation',   // 航空
     };
     return classMap[prefix] || 'telegram-other';
 }
