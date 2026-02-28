@@ -46,7 +46,6 @@ div.duplicate {
 
 div.modalContentWrap {
   background: #aee;
-  margin: 90px 0 0 0;
 }
 div.modalContent {
   background: #eee;
@@ -63,10 +62,11 @@ div.selectSpecLF {
   padding: 10px 20px;
 }
 div.modalHeader {
-  position: fixed;
+  position: sticky;
+  top: 0;
+  z-index: 1;
   background: #cfc;
   text-align: center;
-  width: 90%;
 }
 
 div.modalHeader button {

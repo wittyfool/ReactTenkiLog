@@ -1,4 +1,5 @@
-import { render, screen } from '@testing-library/react';
+import React from 'react';
+import { render, screen, act } from '@testing-library/react';
 import App, { getTelegramClass } from './App';
 
 test('renders app title', () => {
@@ -19,4 +20,22 @@ test('getTelegramClass returns correct class for known prefixes', () => {
 test('getTelegramClass returns telegram-other for unknown or missing type', () => {
   expect(getTelegramClass('https://example.com/data/20210101_0_ZZXX99_100000.xml')).toBe('telegram-other');
   expect(getTelegramClass('https://example.com/data/no_type_here.xml')).toBe('telegram-other');
+});
+
+test('modal shows telegram URL as a link when telegramUrl is set', () => {
+  const ref = React.createRef();
+  render(<App ref={ref} />);
+  const telegramUrl = 'https://www.data.jma.go.jp/developer/xml/data/20210101_0_VPFD50_100000.xml';
+  act(() => {
+    ref.current.setState({
+      modalIsOpen: true,
+      title: 'テスト電文',
+      content: 'テスト内容',
+      telegramClass: 'telegram-weather',
+      telegramUrl,
+    });
+  });
+  const link = screen.getByRole('link', { name: telegramUrl });
+  expect(link).toBeInTheDocument();
+  expect(link).toHaveAttribute('href', telegramUrl);
 });
