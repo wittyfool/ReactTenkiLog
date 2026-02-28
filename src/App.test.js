@@ -70,7 +70,7 @@ test('dateJST omits leading zeros from month and day', () => {
 });
 
 test('abbreviateOffice removes 地方気象台 from office name', () => {
-  expect(abbreviateOffice('大阪地方気象台')).toBe('大阪気象台');
-  expect(abbreviateOffice('東京地方気象台')).toBe('東京気象台');
+  expect(abbreviateOffice('大阪地方気象台')).toBe('大阪');
+  expect(abbreviateOffice('東京地方気象台')).toBe('東京');
   expect(abbreviateOffice('気象庁')).toBe('気象庁');
 });

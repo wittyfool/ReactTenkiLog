@@ -88,9 +88,9 @@ function dateJST(gmtStr){
     return jstStr;
 }
 export { dateJST };
-// 〇〇地方気象台 → 〇〇気象台 に省略する
+// 〇〇地方気象台 → 〇〇 に省略する
 function abbreviateOffice(name){
-  return name.replace('地方気象台', '気象台');
+  return name.replace('地方気象台', '');
 }
 export { abbreviateOffice };
 // ------------------------------------------------------
