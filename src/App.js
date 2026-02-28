@@ -329,15 +329,21 @@ class App extends Component {
           isLoaded: true,
           error: 'read log: NO-ERROR',
           items: array.slice(0, 100),
-          message: '', // Success
+          message: '', // 読み込み成功: メッセージをクリア
         });
     })
+    // .then(success, error) ではなく .catch() を使う。
+    // .then の第2引数はネットワークエラーのみをキャッチし、
+    // 直前の成功ハンドラ内でスローされた例外（XMLパース失敗など）は
+    // キャッチできない。.catch() を使うことで、成功ハンドラ内の
+    // 例外も含めてすべてのエラーを捕捉し、「Updating...」が
+    // 表示されたままにならないようにする。
     .catch((error) => {
       console.log('readData error... url=' + this.state.url);
       this.setState({
         isLoaded: false,
         error: 'NG',
-        message: '',
+        message: '', // エラー時もメッセージをクリアして「Updating...」のままにならないようにする
       });
     });
 
