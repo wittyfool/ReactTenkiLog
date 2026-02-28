@@ -68,3 +68,45 @@ test('dateJST omits leading zeros from month and day', () => {
   const result = dateJST('2026-01-05T00.05.00Z');
   expect(result).toBe('1/5 09:05');
 });
+
+test('list shows date+time for the first item of each day, time-only for subsequent same-day items', () => {
+  const ref = React.createRef();
+  render(<App ref={ref} />);
+
+  // Three items: two on 2/28 (JST), one on 2/27 (JST)
+  const items = [
+    {
+      id: 'item1',
+      updated: '2026-02-28T00.30.00Z', // 2/28 09:30 JST
+      title: '電文A',
+      author: { name: '東京管区' },
+      link: { $: { href: 'https://example.com/data/20260228_0_VPFD50_1.xml' } },
+    },
+    {
+      id: 'item2',
+      updated: '2026-02-28T01.00.00Z', // 2/28 10:00 JST (same date)
+      title: '電文B',
+      author: { name: '東京管区' },
+      link: { $: { href: 'https://example.com/data/20260228_0_VPFD50_2.xml' } },
+    },
+    {
+      id: 'item3',
+      updated: '2026-02-27T00.30.00Z', // 2/27 09:30 JST (different date)
+      title: '電文C',
+      author: { name: '東京管区' },
+      link: { $: { href: 'https://example.com/data/20260227_0_VPFD50_3.xml' } },
+    },
+  ];
+
+  act(() => {
+    ref.current.setState({ items });
+  });
+
+  const datetimeSpans = document.querySelectorAll('.datetime');
+  // First item of 2/28: shows date+time
+  expect(datetimeSpans[0].textContent.trim()).toBe('2/28 09:30');
+  // Second item of 2/28: shows time only (no date)
+  expect(datetimeSpans[1].textContent.trim()).toBe('10:00');
+  // First item of 2/27: shows date+time (new date)
+  expect(datetimeSpans[2].textContent.trim()).toBe('2/27 09:30');
+});
