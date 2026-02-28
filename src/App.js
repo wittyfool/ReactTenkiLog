@@ -202,6 +202,7 @@ class App extends Component {
               content: json_repl,
               title: title,
               telegramClass: getTelegramClass(str),
+              telegramUrl: str,
             });
         },
         (error) => {
@@ -261,6 +262,9 @@ class App extends Component {
           <div className="modalHeader">
             <button onClick={this.closeModal}> 閉じる </button>
             <h3> {this.state.title} </h3>
+            {/^https?:\/\//.test(this.state.telegramUrl) && (
+              <div className="telegramUrl"><a href={this.state.telegramUrl} target="_blank" rel="noopener noreferrer">{this.state.telegramUrl}</a></div>
+            )}
           </div>
           <div className="modalContentWrap">
             <div className={`modalContent ${this.state.telegramClass || ''}`}><pre>{this.state.content}</pre></div>
