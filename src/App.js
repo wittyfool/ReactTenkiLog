@@ -88,6 +88,11 @@ function dateJST(gmtStr){
     return jstStr;
 }
 export { dateJST };
+// 〇〇地方気象台 → 〇〇 に省略する
+function abbreviateOffice(name){
+  return name.replace('地方気象台', '');
+}
+export { abbreviateOffice };
 // ------------------------------------------------------
 
 class Feed extends Component {
@@ -165,7 +170,7 @@ class MyList extends Component {
               {this.props.item["title"]}
               </span>
               <span> </span>
-              {this.props.item["author"]["name"]}
+              {abbreviateOffice(this.props.item["author"]["name"])}
 
             </li>
         </ul>
@@ -347,7 +352,7 @@ class App extends Component {
           contentLabel="telegramModal"
           >
           <div className="modalHeader">
-            <button onClick={this.closeModal}> 閉じる </button>
+            <button onClick={this.closeModal}>ｘ</button>
             <h3> {this.state.title} </h3>
             {/^https?:\/\//.test(this.state.telegramUrl) && (
               <div className="telegramUrl"><a href={this.state.telegramUrl} target="_blank" rel="noopener noreferrer">{this.state.telegramUrl.split('/').filter(Boolean).pop()}</a></div>
