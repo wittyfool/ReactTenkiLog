@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, act } from '@testing-library/react';
-import App, { getTelegramClass, getXslForUrl, dateJST } from './App';
+import App, { getTelegramClass, getXslForUrl, dateJST, abbreviateOffice } from './App';
 
 test('renders app title', () => {
   render(<App />);
@@ -67,4 +67,10 @@ test('dateJST omits leading zeros from month and day', () => {
   // 2026-01-05T00:05:00Z in GMT -> 2026-01-05T09:05:00 JST -> "1/5 09:05"
   const result = dateJST('2026-01-05T00.05.00Z');
   expect(result).toBe('1/5 09:05');
+});
+
+test('abbreviateOffice removes 地方気象台 from office name', () => {
+  expect(abbreviateOffice('大阪地方気象台')).toBe('大阪気象台');
+  expect(abbreviateOffice('東京地方気象台')).toBe('東京気象台');
+  expect(abbreviateOffice('気象庁')).toBe('気象庁');
 });
