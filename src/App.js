@@ -153,12 +153,13 @@ class MyList extends Component {
     return (
         <ul>
             <li key={this.props.item["id"]}>
-	      <span class="datetime">
-              {this.props.showDate ? datePart + ' ' + timePart : timePart}
+	      <span className="datetime">
+                <span style={{ visibility: this.props.showDate ? 'visible' : 'hidden' }} aria-hidden={!this.props.showDate}>{datePart} </span>
+                {timePart}
 	      </span>
               <span> </span>
               <span
-	    	class="xmldata"
+	    	className="xmldata"
                 style={{ color: '#66f', cursor: 'pointer'}}
                 onClick={()=>{this.clickHandler(this.state.url, this.state.title, this.updateHandler)}} >
               {this.props.item["title"]}
@@ -185,6 +186,7 @@ class App extends Component {
       url : "/feed/regular.xml",
       message: '...',
       modalIsOpen: false,
+      modalLoading: false,
     }
 
     // tricky but necessary
@@ -217,6 +219,7 @@ class App extends Component {
       .replace(reg4, '')
       .replace(reg5, '');
     this.setState({
+      modalLoading: false,
       modalIsOpen: true,
       content: json_repl,
       contentHtml: null,
@@ -230,6 +233,8 @@ class App extends Component {
     // ここがキモ
     //
     var replaced_url;
+
+    this.setState({ modalLoading: true });
 
     // replaced_url = str.replace(/https?:\/\/www\.data\.jma\.go\.jp\/developer\/xml/, 'https://nt2.nt55.net/jmadata_xml');
     replaced_url = str.replace(/https?:\/\/www\.data\.jma\.go\.jp\/developer\/xml/, 'https://tenki.nt55.net/jmadata_xml');
@@ -263,6 +268,7 @@ class App extends Component {
                   const div = document.createElement('div');
                   div.appendChild(resultFrag);
                   this.setState({
+                    modalLoading: false,
                     modalIsOpen: true,
                     content: null,
                     contentHtml: div.innerHTML,
@@ -280,6 +286,7 @@ class App extends Component {
         },
         (error) => {
             console.log("openModal: fetch NG");
+            this.setState({ modalLoading: false });
         }
       );
   }
@@ -325,6 +332,13 @@ class App extends Component {
         <header className="App-header">
           <h1 className="App-title">天気ログ</h1>
         </header>
+
+        {this.state.modalLoading && (
+          <div className="loadingOverlay" role="status" aria-live="polite" aria-label="読み込み中">
+            <div className="loadingSpinner"></div>
+            <span>読み込み中...</span>
+          </div>
+        )}
 
         <Modal
           isOpen={this.state.modalIsOpen}
