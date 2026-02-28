@@ -35,7 +35,7 @@ test('modal shows telegram URL as a link when telegramUrl is set', () => {
       telegramUrl,
     });
   });
-  const link = screen.getByRole('link', { name: telegramUrl });
+  const link = screen.getByRole('link', { name: '20210101_0_VPFD50_100000.xml' });
   expect(link).toBeInTheDocument();
   expect(link).toHaveAttribute('href', telegramUrl);
 });
