@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, act } from '@testing-library/react';
-import App, { getTelegramClass, getXslForUrl } from './App';
+import App, { getTelegramClass, getXslForUrl, dateJST } from './App';
 
 test('renders app title', () => {
   render(<App />);
@@ -54,4 +54,17 @@ test('getXslForUrl returns correct XSL for known telegram codes', () => {
 test('getXslForUrl returns null for unknown telegram code', () => {
   expect(getXslForUrl('https://example.com/data/20210101_0_ZZXX99_100000.xml')).toBeNull();
   expect(getXslForUrl('https://example.com/no_code.xml')).toBeNull();
+});
+
+test('dateJST omits seconds from the time portion', () => {
+  // 2026-02-28T00:30:45Z in GMT -> 2026-02-28T09:30:45 JST -> "2/28 09:30"
+  const result = dateJST('2026-02-28T00.30.45Z');
+  expect(result).toBe('2/28 09:30');
+  expect(result).not.toMatch(/\d:\d{2}:\d{2}/);
+});
+
+test('dateJST omits leading zeros from month and day', () => {
+  // 2026-01-05T00:05:00Z in GMT -> 2026-01-05T09:05:00 JST -> "1/5 09:05"
+  const result = dateJST('2026-01-05T00.05.00Z');
+  expect(result).toBe('1/5 09:05');
 });
