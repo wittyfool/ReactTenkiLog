@@ -84,8 +84,10 @@ function dateJST(gmtStr){
     jstStr =  jstStr.replace(/^(20\d\d)-(\d\d)-(\d\d)\D+/, "$2/$3 ");
     jstStr =  jstStr.replace(/^0/, "");
     jstStr =  jstStr.replace(/\/0/, "/");
+    jstStr =  jstStr.replace(/:\d{2}$/, "");
     return jstStr;
 }
+export { dateJST };
 // ------------------------------------------------------
 
 class Feed extends Component {
@@ -146,11 +148,13 @@ class MyList extends Component {
   }
 
   render(){
+    const dateStr = dateJST(this.props.item["updated"]);
+    const [datePart, timePart] = dateStr.split(' ');
     return (
         <ul>
             <li key={this.props.item["id"]}>
 	      <span class="datetime">
-              {dateJST(this.props.item["updated"])}
+              {this.props.showDate ? datePart + ' ' + timePart : timePart}
 	      </span>
               <span> </span>
               <span
@@ -371,9 +375,16 @@ class App extends Component {
 
         <ul>
           {
-            this.state.items.map((item) => (
-            <MyList key={item["id"]} item={item} modal={this.openModal}/>
-           ) )
+            (() => {
+              let lastDate = null;
+              return this.state.items.map((item) => {
+                const fullDate = dateJST(item["updated"]);
+                const dp = fullDate.split(' ')[0];
+                const showDate = dp !== lastDate;
+                if (showDate) lastDate = dp;
+                return <MyList key={item["id"]} item={item} modal={this.openModal} showDate={showDate}/>;
+              });
+            })()
             }
         </ul>
         <div style={{ textAlign: 'left', fontSize: 'small', margin: '20px' }} >
