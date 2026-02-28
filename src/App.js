@@ -27,6 +27,21 @@ function readArg(key){
     }
     return get_params.get(key);
 }
+function getTelegramClass(url){
+    const match = url.match(/_([A-Z]{2,4}\d+)_/);
+    if(!match) return 'telegram-other';
+    const prefix = match[1].substring(0, 2);
+    const classMap = {
+        'VP': 'telegram-weather',
+        'VW': 'telegram-warning',
+        'VX': 'telegram-earthquake',
+        'VF': 'telegram-volcano',
+        'VM': 'telegram-ocean',
+        'VA': 'telegram-aviation',
+    };
+    return classMap[prefix] || 'telegram-other';
+}
+export { getTelegramClass };
 function dateJST(gmtStr){
     var str = gmtStr.replace(/\./g, ':');
     var jst = new Date(str);
@@ -184,6 +199,7 @@ class App extends Component {
               modalIsOpen: true,
               content: json_repl,
               title: title,
+              telegramClass: getTelegramClass(str),
             });
         },
         (error) => {
@@ -245,7 +261,7 @@ class App extends Component {
             <h3> {this.state.title} </h3>
           </div>
           <div className="modalContentWrap">
-            <div className="modalContent"><pre>{this.state.content}</pre></div>
+            <div className={`modalContent ${this.state.telegramClass || ''}`}><pre>{this.state.content}</pre></div>
           </div>
         </Modal>
 
