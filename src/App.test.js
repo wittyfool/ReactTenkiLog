@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, act } from '@testing-library/react';
-import App, { getTelegramClass } from './App';
+import App, { getTelegramClass, getXslForUrl } from './App';
 
 test('renders app title', () => {
   render(<App />);
@@ -38,4 +38,20 @@ test('modal shows telegram URL as a link when telegramUrl is set', () => {
   const link = screen.getByRole('link', { name: '20210101_0_VPFD50_100000.xml' });
   expect(link).toBeInTheDocument();
   expect(link).toHaveAttribute('href', telegramUrl);
+});
+
+test('getXslForUrl returns correct XSL for VPFW50 (府県週間天気予報)', () => {
+  const url = 'https://www.data.jma.go.jp/developer/xml/data/20260228074022_0_VPFW50_030000.xml';
+  expect(getXslForUrl(url)).toBe('190501_shukan.xsl');
+});
+
+test('getXslForUrl returns correct XSL for known telegram codes', () => {
+  expect(getXslForUrl('https://example.com/data/20210101_0_VPFD50_100000.xml')).toBe('190501_yoho.xsl');
+  expect(getXslForUrl('https://example.com/data/20210101_0_VPTI50_100000.xml')).toBe('190501_typhoon.xsl');
+  expect(getXslForUrl('https://example.com/data/20210101_0_VZSA50_100000.xml')).toBe('190501_tenkizu.xsl');
+});
+
+test('getXslForUrl returns null for unknown telegram code', () => {
+  expect(getXslForUrl('https://example.com/data/20210101_0_ZZXX99_100000.xml')).toBeNull();
+  expect(getXslForUrl('https://example.com/no_code.xml')).toBeNull();
 });
