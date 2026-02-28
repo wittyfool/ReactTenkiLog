@@ -331,12 +331,13 @@ class App extends Component {
           items: array.slice(0, 100),
           message: '', // Success
         });
-    },
-    (error) => {
+    })
+    .catch((error) => {
       console.log('readData error... url=' + this.state.url);
       this.setState({
         isLoaded: false,
         error: 'NG',
+        message: '',
       });
     });
 
