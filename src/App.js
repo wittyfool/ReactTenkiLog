@@ -263,7 +263,7 @@ class App extends Component {
             <button onClick={this.closeModal}> 閉じる </button>
             <h3> {this.state.title} </h3>
             {/^https?:\/\//.test(this.state.telegramUrl) && (
-              <div className="telegramUrl"><a href={this.state.telegramUrl} target="_blank" rel="noopener noreferrer">{this.state.telegramUrl}</a></div>
+              <div className="telegramUrl"><a href={this.state.telegramUrl} target="_blank" rel="noopener noreferrer">{this.state.telegramUrl.split('/').filter(Boolean).pop()}</a></div>
             )}
           </div>
           <div className="modalContentWrap">
