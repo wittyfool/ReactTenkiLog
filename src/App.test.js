@@ -74,3 +74,10 @@ test('abbreviateOffice removes 地方気象台 from office name', () => {
   expect(abbreviateOffice('東京地方気象台')).toBe('東京');
   expect(abbreviateOffice('気象庁')).toBe('気象庁');
 });
+
+test('abbreviateOffice removes 管区気象台 from office name', () => {
+  expect(abbreviateOffice('仙台管区気象台')).toBe('仙台');
+  expect(abbreviateOffice('札幌管区気象台')).toBe('札幌');
+  expect(abbreviateOffice('福岡管区気象台')).toBe('福岡');
+  expect(abbreviateOffice('大阪管区気象台')).toBe('大阪');
+});
