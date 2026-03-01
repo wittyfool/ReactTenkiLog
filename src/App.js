@@ -335,8 +335,8 @@ class App extends Component {
   {[
     { url: 'regular', label: '定時' },
     { url: 'extra',   label: '随時' },
-    { url: 'eqvol',   label: '地震' },
-    { url: 'vol',     label: '火山' },
+    { url: 'eqvol',   label: '地震火山' },
+    { url: 'other',   label: 'その他' },
   ].map(({ url, label }) => {
     const activeTab = this.state.url.replace(/^\/feed\/(.+)\.xml$/, '$1');
     return (
