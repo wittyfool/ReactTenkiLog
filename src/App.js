@@ -93,42 +93,6 @@ function abbreviateOffice(name){
   return name.replace('地方気象台', '');
 }
 export { abbreviateOffice };
-// ------------------------------------------------------
-
-class Feed extends Component {
-    constructor(props){
-      super(props);
-
-      if(this.props.handler !== undefined){
-        this.clickHandler = this.props.handler.bind(this);
-      } else {
-        this.clickHandler = this._clickHandler.bind(this);
-      }
-
-      //
-      if(this.props.update !== undefined){
-        this.updateHandler = this.props.update.bind(this);
-      } else {
-        this.updateHandler = this._updateHandler.bind(this);
-      }
-    }
-
-    _clickHandler(str, callback){
-        console.log("clicked " + str);
-    }
-    _updateHandler(){
-        console.log("_updateHandler...");
-    }
-
-    render(){
-        return (
-            <li onClick={()=>{this.clickHandler(this.props.url, this.updateHandler)}}
-                style={{ color: '#66f', cursor: 'pointer'}}>
-                {this.props.text} </li>
-        );
-    }
-}
-
 // -------------------------------------------------------------
 class MyList extends Component {
   constructor(props){
@@ -367,27 +331,24 @@ class App extends Component {
           </div>
         </Modal>
 
-<div className="selectSpec" style={{ textAlign: 'left' }}>
-<div className="selectSpecHF">
-高頻度
-<ul>
-<Feed url="regular" text="定時" handler={this.urlHandler} update={this.readData}/>
-<Feed url="extra" text="随時" handler={this.urlHandler} update={this.readData}/>
-<Feed url="eqvol" text="地震火山" handler={this.urlHandler} update={this.readData}/>
-<Feed url="other" text="その他" handler={this.urlHandler} update={this.readData}/>
-</ul>
-</div>
-
-<div className="selectSpecLF">
-長期
-<ul>
-<Feed url="regular_l" text="定時" handler={this.urlHandler} update={this.readData}/>
-<Feed url="extra_l" text="随時" handler={this.urlHandler} update={this.readData}/>
-<Feed url="eqvol_l" text="地震火山" handler={this.urlHandler} update={this.readData}/>
-<Feed url="other_l" text="その他" handler={this.urlHandler} update={this.readData}/>
-</ul>
-
-</div>
+<div className="tabBar">
+  {[
+    { url: 'regular', label: '定時' },
+    { url: 'extra',   label: '随時' },
+    { url: 'eqvol',   label: '地震' },
+    { url: 'vol',     label: '火山' },
+  ].map(({ url, label }) => {
+    const activeTab = this.state.url.replace(/^\/feed\/(.+)\.xml$/, '$1');
+    return (
+      <button
+        key={url}
+        className={`tabBtn${activeTab === url ? ' tabBtn-active' : ''}`}
+        onClick={() => { this.urlHandler(url, this.readData); }}
+      >
+        {label}
+      </button>
+    );
+  })}
 </div>
 
         <div> {this.state.message} </div>
